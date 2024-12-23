@@ -2,9 +2,16 @@ package pro.jayeshseth.slides.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import pro.jayeshseth.slides.R
+
+val chalk_font = FontFamily(
+    Font(R.font.eraser_regular, FontWeight.Normal),
+    Font(R.font.eraser_dust, FontWeight.Light)
+)
 
 // Set of Material typography styles to start with
 val Typography = Typography(
