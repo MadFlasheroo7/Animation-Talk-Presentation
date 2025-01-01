@@ -51,10 +51,14 @@ android {
 }
 
 dependencies {
+    implementation(libs.coil3.compose)
+    implementation(libs.coil3.network.okhttp)
+    implementation(libs.coil3.gif)
+    implementation(libs.madifiers.madButtons)
+    implementation(libs.madifiers.animatedTextUnit)
     implementation(libs.hypnoticcanvas)
     implementation(libs.hypnoticcanvas.shaders)
     implementation(libs.compose.shimmer)
-    implementation(libs.animatetextunitasstate)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
