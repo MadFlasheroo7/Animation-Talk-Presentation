@@ -6,4 +6,7 @@ import kotlinx.serialization.Serializable
 object StartPage
 
 @Serializable
-object Slide1
+object Slide1 // Why animation first ui
+
+@Serializable
+object Slide2 // tween vs spring

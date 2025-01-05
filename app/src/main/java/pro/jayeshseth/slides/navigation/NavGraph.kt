@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import pro.jayeshseth.slides.screens.Slide1
+import pro.jayeshseth.slides.screens.Slide2
 import pro.jayeshseth.slides.screens.StartPage
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -24,7 +25,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = StartPage,
+        startDestination = Slide2,
         modifier = modifier
     ) {
         composable<StartPage>(
@@ -66,10 +67,15 @@ fun NavGraph(
             }
         ) {
             Slide1(
-                navToSlide = { navController.navigate(StartPage) },
+                navToSlide = { navController.navigate(Slide2) },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = this
             )
+        }
+
+        composable<Slide2> {
+            Slide2(sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = this)
         }
     }
 }
