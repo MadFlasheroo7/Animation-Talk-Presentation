@@ -10,8 +10,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,10 +52,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pro.jayeshseth.slides.R
 
+private val gradientColors = listOf(
+    Color(0xFFF700FF),
+    Color(0xFF03A9F4),
+    Color(0xFFFFD500)
+)
+
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun StartPage(
-    navToSlide: () -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier
@@ -68,15 +71,8 @@ fun StartPage(
         fontWeight = FontWeight.Bold,
         fontSynthesis = FontSynthesis.Style
     )
-    val interactionSource = remember {
-        MutableInteractionSource()
-    }
     var cardSize by remember { mutableStateOf(IntSize.Zero) }
-    val gradientColors = listOf(
-        Color(0xFFF700FF),
-        Color(0xFF03A9F4),
-        Color(0xFFFFD500)
-    )
+
     val infiniteTransition = rememberInfiniteTransition(label = "text gradient animation")
 
     val offset by infiniteTransition.animateFloat(
@@ -104,13 +100,7 @@ fun StartPage(
 
     with(sharedTransitionScope) {
         Box(
-            modifier
-                .fillMaxSize()
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null,
-                    onClick = navToSlide
-                ),
+            modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column(
