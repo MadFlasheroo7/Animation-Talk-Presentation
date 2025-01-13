@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.Box
@@ -21,29 +22,51 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.rememberNavController
 import com.mikepenz.hypnoticcanvas.shaderBackground
 import com.mikepenz.hypnoticcanvas.shaders.InkFlow
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationStrategy
+import pro.jayeshseth.slides.components.VolumeButtonsHandler
 import pro.jayeshseth.slides.navigation.NavGraph
 import pro.jayeshseth.slides.ui.theme.AnimationTalkSlidesTheme
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalSharedTransitionApi::class)
+    private val viewModel: GlobalNavigatorViewModel by viewModels()
+
+    @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalSerializationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
-            val window = (LocalContext.current as Activity).window
             val view = LocalView.current
+            val context = LocalContext.current
+            val window = (context as Activity).window
+
             val controller = remember(key1 = window, key2 = view) {
                 WindowInsetsControllerCompat(window, view)
             }
+            val navController = rememberNavController()
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             controller.hide(WindowInsetsCompat.Type.systemBars())
-
+            VolumeButtonsHandler(
+                onVolumeUp = {
+                    viewModel.onGlobalForward(
+                        {
+                            navController.navigate(it)
+                        },
+                        navController.currentDestination!!
+                    )
+                },
+                onVolumeDown = {
+                    viewModel.onGlobalBack(navController.currentDestination!!) {
+                        navController.navigate(it)
+                    }
+                }
+            )
             AnimationTalkSlidesTheme {
                 Surface(
                     modifier = Modifier
-                        .fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
+                        .fillMaxSize()
                 ) {
                     SharedTransitionLayout {
 
@@ -55,8 +78,10 @@ class MainActivity : ComponentActivity() {
                                     .shaderBackground(InkFlow, speed = 0.3f)
                             )
                             NavGraph(
-                                rememberNavController(),
-                                this@SharedTransitionLayout
+                                slide1State = viewModel.slide1State.value,
+                                slide2State = viewModel.slide2State.value,
+                                navController = navController,
+                                sharedTransitionScope = this@SharedTransitionLayout
                             )
                         }
                     }
@@ -64,4 +89,9 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+inline fun <reified T : Any> routeName(serializer: SerializationStrategy<T>): String {
+    return serializer.descriptor.serialName
 }

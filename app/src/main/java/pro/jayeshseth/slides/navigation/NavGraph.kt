@@ -5,7 +5,6 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -14,18 +13,21 @@ import androidx.navigation.compose.composable
 import pro.jayeshseth.slides.screens.Slide1
 import pro.jayeshseth.slides.screens.Slide2
 import pro.jayeshseth.slides.screens.StartPage
+import pro.jayeshseth.slides.utils.states.Slide1State
+import pro.jayeshseth.slides.utils.states.Slide2State
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun NavGraph(
+    slide1State: Slide1State,
+    slide2State: Slide2State,
     navController: NavHostController,
     sharedTransitionScope: SharedTransitionScope,
-//    animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = Slide2,
+        startDestination = StartPage,
         modifier = modifier
     ) {
         composable<StartPage>(
@@ -36,17 +38,13 @@ fun NavGraph(
                 )
             },
             exitTransition = {
-                fadeOut(
-                    animationSpec = tween(2000)
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(400, easing = LinearEasing)
                 )
-//                slideOutOfContainer(
-//                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-//                    animationSpec = tween(400, easing = LinearEasing)
-//                )
             }
         ) {
             StartPage(
-                navToSlide = { navController.navigate(Slide1) },
                 modifier = modifier,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = this
@@ -67,15 +65,17 @@ fun NavGraph(
             }
         ) {
             Slide1(
-                navToSlide = { navController.navigate(Slide2) },
+                slide1State = slide1State,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = this
             )
         }
 
         composable<Slide2> {
-            Slide2(sharedTransitionScope = sharedTransitionScope,
-                animatedVisibilityScope = this)
+            Slide2(
+                slide2State, sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = this
+            )
         }
     }
 }

@@ -6,7 +6,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
@@ -28,8 +27,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,16 +42,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
@@ -74,77 +66,10 @@ import pro.jayeshseth.slides.components.ChalkBoard
 import pro.jayeshseth.slides.components.CoilGif
 import pro.jayeshseth.slides.components.RetroTV
 import pro.jayeshseth.slides.components.SlideInOutHorizontal
+import pro.jayeshseth.slides.components.StaticEffect
+import pro.jayeshseth.slides.utils.states.Slide1State
 import pro.jayeshseth.slides.ui.theme.chalk_font
-import kotlin.random.Random
-
-@Language("AGSL")
-val UNIVERSE_SHADER = """
-    // Star Nest by Pablo Roman Andrioli
-
-    // This content is under the MIT License.
-
-    const int iterations = 17;
-    const float formuparam = 0.53;
-
-    const int volsteps = 20;
-    const float stepsize = 0.1;
-
-    const float zoom  = 0.800;
-    const float tile  = 0.850;
-    const float speed =0.010 ;
-
-    const float brightness =0.0015;
-    const float darkmatter =0.300;
-    const float distfading =0.730;
-    const float saturation =0.850;
-
-
-    half4 main( in vec2 fragCoord )
-    {
-    	//get coords and direction
-    	vec2 uv=fragCoord.xy/iResolution.xy-.5;
-    	uv.y*=iResolution.y/iResolution.x;
-    	vec3 dir=vec3(uv*zoom,1.);
-    	float time=iTime*speed+.25;
-
-    	//mouse rotation
-    	float a1=.5+iMouse.x/iResolution.x*2.;
-    	float a2=.8+iMouse.y/iResolution.y*2.;
-    	mat2 rot1=mat2(cos(a1),sin(a1),-sin(a1),cos(a1));
-    	mat2 rot2=mat2(cos(a2),sin(a2),-sin(a2),cos(a2));
-    	dir.xz*=rot1;
-    	dir.xy*=rot2;
-    	vec3 from=vec3(1.,.5,0.5);
-    	from+=vec3(time*2.,time,-2.);
-    	from.xz*=rot1;
-    	from.xy*=rot2;
-    	
-    	//volumetric rendering
-    	float s=0.1,fade=1.;
-    	vec3 v=vec3(0.);
-    	for (int r=0; r<volsteps; r++) {
-    		vec3 p=from+s*dir*.5;
-    		p = abs(vec3(tile)-mod(p,vec3(tile*2.))); // tiling fold
-    		float pa,a=pa=0.;
-    		for (int i=0; i<iterations; i++) { 
-    			p=abs(p)/dot(p,p)-formuparam; // the magic formula
-    			a+=abs(length(p)-pa); // absolute sum of average change
-    			pa=length(p);
-    		}
-    		float dm=max(0.,darkmatter-a*a*.001); //dark matter
-    		a*=a*a; // add contrast
-    		if (r>6) fade*=1.-dm; // dark matter, don't render near
-    		//v+=vec3(dm,dm*.5,0.);
-    		v+=fade;
-    		v+=vec3(s,s*s,s*s*s*s)*a*brightness*fade; // coloring based on distance
-    		fade*=distfading; // distance fading
-    		s+=stepsize;
-    	}
-    	v=mix(vec3(length(v)),v,saturation); //color adjust
-    	return vec4(v*.01,1.);	
-    	
-    }
-""".trimIndent()
+import pro.jayeshseth.slides.utils.Slide1TvChannels
 
 val textStyle = TextStyle(
     fontSize = 50.sp,
@@ -152,63 +77,14 @@ val textStyle = TextStyle(
     fontWeight = FontWeight.ExtraBold,
 )
 
-@Preview
-@Composable
-private fun StaticEffect() {
-    var staticPattern by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(100)
-            staticPattern = Random.nextInt()
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.LightGray)
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val random = Random(staticPattern)
-            repeat(10_000) {
-                val x = random.nextFloat() * size.width
-                val y = random.nextFloat() * size.height
-                drawCircle(
-                    color = if (random.nextBoolean()) Color.White else Color.Black,
-                    radius = 3f,
-                    center = Offset(x, y)
-                )
-            }
-        }
-    }
-}
-
-/***
- * - not static
- * - better foundation
- * - find ux issues
- * - find performance blockers
- */
-
-sealed class TvChannels(val title: String?) {
-    data object LOADING : TvChannels(null)
-    data object STATIC : TvChannels("Not Static")
-    data object FOUNDATION : TvChannels("Foundation")
-    data object UX : TvChannels("Find UX Issues")
-    data object PERFORMANCE : TvChannels("Find Performance Blockers")
-    data object EXITING : TvChannels(null)
-}
-
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Slide1(
-    navToSlide: () -> Unit,
+    slide1State: Slide1State,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier
 ) {
-    val slide1State = remember { Slide1State() }
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier.padding(30.dp)
@@ -219,11 +95,6 @@ fun Slide1(
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope
             )
-            Button({
-                slide1State.handleClick()
-            }) {
-                Text("Next")
-            }
         }
         TvLayout(
             shouldShowTVLayout = slide1State.showTvLayout.value,
@@ -233,51 +104,6 @@ fun Slide1(
     }
 }
 
-class Slide1State {
-    var swap = mutableStateOf(false)
-        private set
-    var showTvLayout = mutableStateOf(false)
-        private set
-    var currentTvChannel = mutableStateOf<TvChannels>(TvChannels.LOADING)
-        private set
-    var currentChalkBoardText = mutableStateListOf(TvChannels.LOADING.title)
-    private var clickCounter = mutableIntStateOf(0)
-
-    fun handleClick() {
-        clickCounter.intValue++
-        when (clickCounter.intValue) {
-            1 -> swap.value = true
-            2 -> if (swap.value) showTvLayout.value = true
-            3 -> if (showTvLayout.value) updateTvContent()
-        }
-    }
-
-    private fun updateTvContent() {
-        // Update TV content
-        currentTvChannel.value = when (currentTvChannel.value) {
-            TvChannels.LOADING -> TvChannels.STATIC
-            TvChannels.STATIC -> TvChannels.FOUNDATION
-            TvChannels.FOUNDATION -> TvChannels.UX
-            TvChannels.UX -> TvChannels.PERFORMANCE
-            TvChannels.PERFORMANCE -> TvChannels.EXITING
-            TvChannels.EXITING -> TvChannels.LOADING
-        }
-
-        val newText = when (currentTvChannel.value) {
-            TvChannels.LOADING -> TvChannels.LOADING.title
-            TvChannels.STATIC -> TvChannels.STATIC.title
-            TvChannels.FOUNDATION -> TvChannels.FOUNDATION.title
-            TvChannels.UX -> TvChannels.UX.title
-            TvChannels.PERFORMANCE -> TvChannels.PERFORMANCE.title
-            TvChannels.EXITING -> TvChannels.EXITING.title
-        }
-        currentChalkBoardText.add(newText)
-
-        // Keep click count at 3 to continue cycling
-        clickCounter.intValue = 2
-    }
-
-}
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -292,29 +118,23 @@ private fun TitleLayout(
             SlideInOutHorizontal(visible = !swap) {
                 Text("First ", style = textStyle)
             }
-            Text(
-                "Animations ",
-                modifier = Modifier
-//                        .padding(bottom = 50.dp)
-                    .sharedBounds(
-                        sharedContentState = rememberSharedContentState("animations"),
-//                            enter = slideInHorizontally(),
-//                            exit = slideOutHorizontally(),
-
-                        animatedVisibilityScope = animatedVisibilityScope,
-//                            boundsTransform = BoundsTransform { initialBounds, targetBounds ->
-//                                spring(
-//                                    dampingRatio = Spring.DampingRatioHighBouncy,
-//                                    stiffness = Spring.StiffnessLow
-//                                )
-//                            }
-                    ),
-                style = TextStyle(
-                    fontSize = 50.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.ExtraBold,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.sharedBounds(
+                    sharedContentState = rememberSharedContentState("animations"),
+                    animatedVisibilityScope = animatedVisibilityScope,
                 )
-            )
+            ) {
+                Text("Anima", style = textStyle)
+                Text(
+                    "t", style = textStyle, modifier = Modifier
+                        .sharedBounds(
+                            sharedContentState = rememberSharedContentState("tween"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
+                )
+                Text("ions ", style = textStyle)
+            }
             SlideInOutHorizontal(visible = !swap) {
                 Text("UI ", style = textStyle)
             }
@@ -340,7 +160,7 @@ private fun TitleLayout(
 @Composable
 private fun TvLayout(
     shouldShowTVLayout: Boolean,
-    currentTvChannel: TvChannels,
+    currentTvChannel: Slide1TvChannels,
     currentChalkBoardText: List<String?>,
     modifier: Modifier = Modifier
 ) {
@@ -349,8 +169,7 @@ private fun TvLayout(
     val lazyListState = rememberLazyListState()
 
     LaunchedEffect(currentChalkBoardText.size) {
-        Log.d("TAG", "TvLayout: ${currentChalkBoardText.lastIndex}")
-        lazyListState.animateScrollToItem(currentChalkBoardText.lastIndex)
+        if (currentChalkBoardText.isNotEmpty()) lazyListState.animateScrollToItem(currentChalkBoardText.lastIndex)
     }
 
     LaunchedEffect(shouldShowTVLayout) {
@@ -358,6 +177,10 @@ private fun TvLayout(
             showTV = true
             delay(500)
             showChalkBoard = true
+        }
+        if (!shouldShowTVLayout) {
+            showTV = false
+            showChalkBoard = false
         }
     }
     Row(
@@ -380,9 +203,9 @@ private fun TvLayout(
                     }, label = "animate tv"
                 ) { tvContent ->
                     when (tvContent) {
-                        TvChannels.LOADING -> StaticEffect()
-                        TvChannels.STATIC -> NotStaticLayout()
-                        TvChannels.FOUNDATION -> {
+                        Slide1TvChannels.LOADING -> StaticEffect()
+                        Slide1TvChannels.STATIC -> NotStaticLayout()
+                        Slide1TvChannels.FOUNDATION -> {
                             CenteredBox {
                                 CoilGif(
                                     R.raw.foundation,
@@ -400,7 +223,7 @@ private fun TvLayout(
                          * Transitions that enter or remain persistent on the screen use longer durations. This helps users focus attention on what's new on screen.
                          * url: https://m3.material.io/styles/motion/easing-and-duration/applying-easing-and-duration
                          */
-                        TvChannels.UX -> {
+                        Slide1TvChannels.UX -> {
                             CenteredBox {
                                 CoilGif(
                                     R.raw.app_design,
@@ -410,7 +233,7 @@ private fun TvLayout(
                             }
                         }
 
-                        TvChannels.PERFORMANCE -> {
+                        Slide1TvChannels.PERFORMANCE -> {
                             CenteredBox {
                                 CoilGif(
                                     R.raw.app_lag,
@@ -421,7 +244,7 @@ private fun TvLayout(
                             }
                         }
 
-                        TvChannels.EXITING -> StaticEffect()
+                        Slide1TvChannels.EXITING -> StaticEffect()
                     }
                 }
             }
@@ -457,7 +280,7 @@ private fun TvLayout(
 private fun AnimatedChalkboardText(
     title: String?,
     index: Int,
-    currentTvChannels: TvChannels,
+    currentTvChannels: Slide1TvChannels,
     modifier: Modifier = Modifier
 ) {
     val transitions = updateTransition(index, label = "animate transitions")
@@ -562,32 +385,6 @@ private fun NotStaticLayout() {
                 color = Color.White
             )
 
-        }
-    }
-}
-
-
-@OptIn(ExperimentalSharedTransitionApi::class)
-@Preview(
-    device = "spec:parent=pixel_5,orientation=landscape", showBackground = false,
-    showSystemUi = true
-)
-@Composable
-private fun Slide1Prev() {
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.DarkGray)
-    ) {
-        AnimatedVisibility(true) {
-            SharedTransitionLayout {
-                Slide1(
-                    navToSlide = {},
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedVisibilityScope = this@AnimatedVisibility
-                )
-            }
         }
     }
 }
