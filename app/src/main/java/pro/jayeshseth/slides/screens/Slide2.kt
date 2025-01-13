@@ -1,9 +1,9 @@
 package pro.jayeshseth.slides.screens
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
@@ -12,17 +12,16 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +39,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,6 +46,8 @@ import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.delay
 import pro.jayeshseth.slides.R
 import pro.jayeshseth.slides.components.CoilGif
+import pro.jayeshseth.slides.utils.states.Slide2ContentType
+import pro.jayeshseth.slides.utils.states.Slide2State
 
 // tween vs spring
 
@@ -57,10 +57,12 @@ val subTextStyle = TextStyle(
     fontWeight = FontWeight.Medium,
 )
 
+
 // TODO() add scrolling content (depends on how we nav)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Slide2(
+    slide2State: Slide2State,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier
@@ -74,46 +76,84 @@ fun Slide2(
     ) {
 
         AnimatedVisibility(
-            true,
+            slide2State.showSpringInfo.value,
             modifier = Modifier
                 .weight(1f)
         ) {
-            SpringInfo()
+            SpringInfo(slide2State)
         }
 
         Text(" Or ", style = textStyle)
 
         AnimatedVisibility(
-            true,
+            slide2State.showTweenInfo.value,
             modifier = Modifier.weight(1f)
         ) {
-            TweenInfo(sharedTransitionScope, animatedVisibilityScope)
+            TweenInfo(slide2State, sharedTransitionScope, animatedVisibilityScope)
         }
     }
 }
 
 @Composable
-private fun SpringInfo(modifier: Modifier = Modifier) {
+private fun SpringInfo(
+    state: Slide2State,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text("Spring", style = textStyle, modifier = Modifier)
-        CoilGif(
-            R.raw.spring,
-            contentDescription = "",
-            modifier = Modifier.size(height = 150.dp, width = 300.dp)
-        )
+
 
         // TODO switchable to scroll layout
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+        AnimatedContent(
+            state.currentContent
         ) {
-            PointReveal("- Velocity/physics based")
-            PointReveal("- dampingRatio defies bounciness, stiffness defies velocity.")
-            PointReveal("- good for animations that can be interrupted.")
+            when (it.value) {
+                Slide2ContentType.Points -> {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        CoilGif(
+                            R.raw.spring,
+                            contentDescription = "",
+                            modifier = Modifier.size(height = 150.dp, width = 300.dp)
+                        )
+                        AnimatedVisibility(
+                            state.showFirstPoint.value
+                        ) {
+                            PointReveal("- Velocity/physics based")
+                        }
+                        AnimatedVisibility(
+                            state.showSecondPoint.value
+                        ) {
+                            PointReveal("- dampingRatio defies bounciness, stiffness defies velocity.")
+                        }
+                        AnimatedVisibility(
+                            state.showThirdPoint.value
+                        ) {
+                            PointReveal("- good for animations that can be interrupted.")
+                        }
+                    }
+
+                }
+
+                Slide2ContentType.List -> {
+                    LazyColumn {
+                        items(10) {
+                            Button({}) {
+                                Text("TODO")
+                            }
+                        }
+                    }
+
+                }
+
+                null -> {}
+            }
         }
     }
 }
@@ -252,7 +292,8 @@ fun ScaleAnimationText(
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun TweenInfo(
+private fun TweenInfo(
+    state: Slide2State,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier
@@ -270,46 +311,55 @@ fun TweenInfo(
                         animatedVisibilityScope = animatedVisibilityScope
                     )
             )
-            CoilGif(
-                R.raw.tween, contentDescription = "",
-                modifier = Modifier.size(height = 150.dp, width = 300.dp)
-            )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                PointReveal("- Duration based")
-                PointReveal("- easing - fraction or speed of the animation from start to end ")
-                PointReveal(
-                    "- not the best for interrupting, but a lot of customization possibility.",
-                )
+
+            AnimatedContent(state.currentContent.value) {
+                when (it) {
+                    Slide2ContentType.Points -> {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            CoilGif(
+                                R.raw.tween, contentDescription = "",
+                                modifier = Modifier.size(height = 150.dp, width = 300.dp)
+                            )
+                            AnimatedVisibility(
+                                state.showFirstPoint.value
+                            ) {
+                                PointReveal("- Duration based")
+                            }
+                            AnimatedVisibility(
+                                state.showSecondPoint.value
+                            ) {
+
+                                PointReveal("- easing - fraction or speed of the animation from start to end ")
+                            }
+                            AnimatedVisibility(
+                                state.showThirdPoint.value
+                            ) {
+                                PointReveal(
+                                    "- not the best for interrupting, but a lot of customization possibility.",
+                                )
+                            }
+                        }
+
+                    }
+
+                    Slide2ContentType.List -> {
+                        LazyColumn {
+                            items(10) {
+                                Button({}) {
+                                    Text("TODO")
+                                }
+                            }
+                        }
+
+                    }
+
+                    null -> {}
+                }
             }
         }
     }
 
 }
-
-@OptIn(ExperimentalSharedTransitionApi::class)
-@Preview(
-    device = "spec:parent=pixel_5,orientation=landscape", showBackground = false,
-    showSystemUi = true
-)
-@Composable
-private fun Slide1Prev() {
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.DarkGray)
-    ) {
-        AnimatedVisibility(true) {
-            SharedTransitionLayout {
-                Slide2(
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedVisibilityScope = this@AnimatedVisibility
-                )
-            }
-        }
-    }
-}
-
