@@ -49,6 +49,12 @@ class GlobalNavigatorViewModel : ViewModel() {
                     slide1State.value.reverseClick()
                 else navAction(StartPage)
             }
+
+            currentRoute.route?.equals(routeName(Slide2.serializer())) == true -> {
+                if (slide2State.value.clickCounter.intValue != 0)
+                    slide2State.value.reverseClick()
+                else navAction(Slide1)
+            }
         }
     }
 }

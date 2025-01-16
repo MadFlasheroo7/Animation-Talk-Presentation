@@ -19,7 +19,7 @@ class Slide2State {
 //        private set
     var currentContent = mutableStateOf<Slide2ContentType?>(null)
 
-    private var clickCounter = mutableIntStateOf(0)
+    var clickCounter = mutableIntStateOf(0)
 
     fun handleClick() {
         clickCounter.intValue++
@@ -34,6 +34,39 @@ class Slide2State {
             3 -> showSecondPoint.value = true
             4 -> showThirdPoint.value = true
             5 -> currentContent.value = Slide2ContentType.List
+        }
+    }
+
+    fun reverseClick() {
+//        clickCounter.intValue--
+        when (clickCounter.intValue) {
+            5 -> {
+                currentContent.value = Slide2ContentType.Points
+                clickCounter.intValue = 4
+            }
+
+            4 -> {
+                if (showSecondPoint.value) showThirdPoint.value = false
+                clickCounter.intValue= 3
+            }
+
+            3 -> {
+                if (showFirstPoint.value) showSecondPoint.value = false
+                clickCounter.intValue = 2
+            }
+
+            2 -> {
+                showFirstPoint.value = false
+                clickCounter.intValue = 1
+            }
+
+            1 -> {
+                showSpringInfo.value = false
+                showTweenInfo.value = false
+                clickCounter.intValue = 0
+            }
+
+            else -> clickCounter.intValue = 5
         }
     }
 }
