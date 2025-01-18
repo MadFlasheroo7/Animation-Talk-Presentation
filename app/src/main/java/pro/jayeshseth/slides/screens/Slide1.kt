@@ -1,25 +1,27 @@
 package pro.jayeshseth.slides.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.TwoWayConverter
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
@@ -37,26 +39,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import org.intellij.lang.annotations.Language
 import pro.jayeshseth.animatetextunitasstate.animateTextUnitAsState
 import pro.jayeshseth.buttons.GlowingButton
 import pro.jayeshseth.buttons.GlowingButtonDefaults
@@ -65,17 +69,27 @@ import pro.jayeshseth.slides.components.CenteredBox
 import pro.jayeshseth.slides.components.ChalkBoard
 import pro.jayeshseth.slides.components.CoilGif
 import pro.jayeshseth.slides.components.RetroTV
-import pro.jayeshseth.slides.components.SlideInOutHorizontal
+import pro.jayeshseth.slides.components.SlideInOutHorizontalFromLeft
+import pro.jayeshseth.slides.components.SlideInOutHorizontalFromRight
 import pro.jayeshseth.slides.components.StaticEffect
-import pro.jayeshseth.slides.utils.states.Slide1State
 import pro.jayeshseth.slides.ui.theme.chalk_font
 import pro.jayeshseth.slides.utils.Slide1TvChannels
+import pro.jayeshseth.slides.utils.states.Slide1State
 
 val textStyle = TextStyle(
     fontSize = 50.sp,
     color = Color.White,
     fontWeight = FontWeight.ExtraBold,
 )
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+val boundsTransform = BoundsTransform { initialBounds: Rect, targetBounds: Rect ->
+    spring(
+        dampingRatio = Spring.DampingRatioLowBouncy,
+        stiffness = Spring.StiffnessLow,
+        visibilityThreshold = Rect.VisibilityThreshold
+    )
+}
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -104,7 +118,6 @@ fun Slide1(
     }
 }
 
-
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun TitleLayout(
@@ -115,7 +128,7 @@ private fun TitleLayout(
 ) {
     with(sharedTransitionScope) {
         Row(modifier = modifier) {
-            SlideInOutHorizontal(visible = !swap) {
+            AnimatedVisibility(visible = !swap) {
                 Text("First ", style = textStyle)
             }
             Row(
@@ -123,6 +136,7 @@ private fun TitleLayout(
                 modifier = Modifier.sharedBounds(
                     sharedContentState = rememberSharedContentState("animations"),
                     animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = boundsTransform
                 )
             ) {
                 Text("Anima", style = textStyle)
@@ -130,24 +144,63 @@ private fun TitleLayout(
                     "t", style = textStyle, modifier = Modifier
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState("tween"),
-                            animatedVisibilityScope = animatedVisibilityScope
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                            boundsTransform = BoundsTransform { initialBounds, targetBounds ->
+                                spring(
+                                    dampingRatio = 1f,
+                                    stiffness = Spring.StiffnessVeryLow,
+                                    visibilityThreshold = Rect.VisibilityThreshold
+                                )
+                            }
                         )
                 )
-                Text("ions ", style = textStyle)
+                Text("i", style = textStyle)
+                Text(
+                    "o", style = textStyle, modifier = Modifier
+                        .sharedBounds(
+                            sharedContentState = rememberSharedContentState("or"),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                            boundsTransform = BoundsTransform { initialBounds, targetBounds ->
+                                spring(
+                                    dampingRatio = 1f,
+                                    stiffness = Spring.StiffnessVeryLow,
+                                    visibilityThreshold = Rect.VisibilityThreshold
+                                )
+                            }
+                        )
+                )
+                Text("n", style = textStyle)
+                Text(
+                    "s ", style = textStyle, modifier = Modifier
+                        .sharedBounds(
+                            sharedContentState = rememberSharedContentState("spring"),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                            boundsTransform = BoundsTransform { initialBounds, targetBounds ->
+                                spring(
+                                    dampingRatio = 1f,
+                                    stiffness = Spring.StiffnessVeryLow,
+                                    visibilityThreshold = Rect.VisibilityThreshold
+                                )
+                            }
+                        )
+                )
             }
-            SlideInOutHorizontal(visible = !swap) {
+            AnimatedVisibility(visible = !swap) {
                 Text("UI ", style = textStyle)
             }
-            SlideInOutHorizontal(visible = swap) {
+            AnimatedVisibility(visible = swap) {
                 Text("First ", style = textStyle)
             }
-            SlideInOutHorizontal(visible = swap) {
+            AnimatedVisibility(visible = swap) {
                 Text("UI", style = textStyle)
             }
             AnimatedVisibility(
                 visible = swap,
-                enter = fadeIn(animationSpec = tween(500)),
-                exit = fadeOut(animationSpec = tween(500))
+                enter = fadeIn(),
+                exit = fadeOut()
             ) {
                 Text("??", style = textStyle)
             }
@@ -155,7 +208,6 @@ private fun TitleLayout(
 
     }
 }
-
 
 @Composable
 private fun TvLayout(
@@ -169,13 +221,14 @@ private fun TvLayout(
     val lazyListState = rememberLazyListState()
 
     LaunchedEffect(currentChalkBoardText.size) {
-        if (currentChalkBoardText.isNotEmpty()) lazyListState.animateScrollToItem(currentChalkBoardText.lastIndex)
+        if (currentChalkBoardText.isNotEmpty()) lazyListState.animateScrollToItem(
+            currentChalkBoardText.lastIndex
+        )
     }
 
     LaunchedEffect(shouldShowTVLayout) {
         if (shouldShowTVLayout) {
             showTV = true
-            delay(500)
             showChalkBoard = true
         }
         if (!shouldShowTVLayout) {
@@ -187,20 +240,14 @@ private fun TvLayout(
         horizontalArrangement = Arrangement.spacedBy(25.dp),
         modifier = modifier.padding(top = 25.dp)
     ) {
-        AnimatedVisibility(
-            showTV,
-            enter = scaleIn(tween(5000, easing = EaseIn)),
-            exit = scaleOut(),
-            modifier = Modifier.weight(1f)
-        ) {
-            RetroTV(
-//                Modifier.weight(1f)
-            ) {
+        SlideInOutHorizontalFromLeft(showTV, Modifier.weight(1f)) {
+            RetroTV {
                 AnimatedContent(
                     targetState = currentTvChannel,
                     transitionSpec = {
                         scaleIn() togetherWith scaleOut()
-                    }, label = "animate tv"
+                    },
+                    label = "animate tv"
                 ) { tvContent ->
                     when (tvContent) {
                         Slide1TvChannels.LOADING -> StaticEffect()
@@ -214,6 +261,15 @@ private fun TvLayout(
                                 )
                             }
                         }
+
+                        /**
+                         * make enter animation longer than exit animation
+                         *
+                         * Transitions that exit, dismiss, or collapse an element use shorter durations. Exit transitions are faster because they require less attention than the user’s next task.
+                         *
+                         * Transitions that enter or remain persistent on the screen use longer durations. This helps users focus attention on what's new on screen.
+                         * url: https://m3.material.io/styles/motion/easing-and-duration/applying-easing-and-duration
+                         */
 
                         /**
                          * make enter animation longer than exit animation
@@ -250,14 +306,8 @@ private fun TvLayout(
             }
         }
 
-        AnimatedVisibility(
-            showChalkBoard,
-            enter = scaleIn(tween(5000, easing = EaseIn)),
-            modifier = Modifier
-                .weight(1f)
-        ) {
-            ChalkBoard(
-            ) {
+        SlideInOutHorizontalFromRight(showChalkBoard, Modifier.weight(1f)) {
+            ChalkBoard {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -305,6 +355,7 @@ private fun AnimatedChalkboardText(
             textAlign = TextAlign.Center,
             lineHeight = 32.sp,
             fontFamily = chalk_font,
+            style = LocalTextStyle.current.copy(textMotion = TextMotion.Animated),
             modifier = modifier
         )
     }
@@ -318,7 +369,7 @@ private fun NotStaticLayout() {
     val infiniteTransition = rememberInfiniteTransition()
 
     val colors = listOf(Color.Cyan, Color.Green, Color.Blue, Color.Yellow)
-    var currentColorIndex by remember { mutableStateOf(0) }
+    var currentColorIndex by remember { mutableIntStateOf(0) }
 
     val animatedColor by animateColorAsState(
         targetValue = colors[currentColorIndex],
@@ -384,7 +435,6 @@ private fun NotStaticLayout() {
                 text = "Madifiers",
                 color = Color.White
             )
-
         }
     }
 }
