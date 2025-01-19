@@ -28,10 +28,11 @@ import pro.jayeshseth.slides.components.VolumeButtonsHandler
 import pro.jayeshseth.slides.navigation.NavGraph
 import pro.jayeshseth.slides.ui.theme.AnimationTalkSlidesTheme
 
+// TODO: improve enter animations overall
 class MainActivity : ComponentActivity() {
     private val viewModel: GlobalNavigatorViewModel by viewModels()
 
-    @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalSerializationApi::class)
+    @OptIn(ExperimentalSharedTransitionApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

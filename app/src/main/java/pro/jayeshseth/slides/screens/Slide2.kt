@@ -13,10 +13,8 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -43,6 +41,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,15 +49,18 @@ import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.delay
 import pro.jayeshseth.slides.R
 import pro.jayeshseth.slides.components.CoilGif
+import pro.jayeshseth.slides.utils.AnimationSpecs
 import pro.jayeshseth.slides.utils.states.Slide2State
 
 // tween vs spring
 
 val subTextStyle = TextStyle(
-    fontSize = 20.sp,
+    fontSize = 24.sp,
     color = Color.White,
     fontWeight = FontWeight.Medium,
+    textMotion = TextMotion.Animated
 )
+
 @OptIn(ExperimentalSharedTransitionApi::class)
 val boundsTransformTween = BoundsTransform { initialBounds: Rect, targetBounds: Rect ->
     spring(
@@ -68,7 +70,6 @@ val boundsTransformTween = BoundsTransform { initialBounds: Rect, targetBounds: 
     )
 }
 
-// TODO() add scrolling content (depends on how we nav)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Slide2(
@@ -93,15 +94,26 @@ fun Slide2(
                 modifier = Modifier
                     .weight(1f)
             ) {
-                Text("Spring",
-                    style = textStyle,
+                Row(
                     modifier = Modifier
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState("spring"),
                             animatedVisibilityScope = animatedVisibilityScope,
                             boundsTransform = boundsTransformTween,
+                            enter = slideInHorizontally(
+                                initialOffsetX = { -it },
+                                animationSpec = AnimationSpecs.tweenIntOffset
+                            ) + scaleIn(
+                                animationSpec = AnimationSpecs.tweenFloat,
+                            )
                         )
-                )
+                ) {
+                    Text(
+                        "Spring",
+                        style = textStyle,
+
+                        )
+                }
                 AnimatedVisibility(
                     slide2State.showSpringInfo.value,
                 ) {
@@ -111,25 +123,47 @@ fun Slide2(
 
             AnimatedVisibility(
                 animateIn.value,
-                enter = scaleIn(tween(500)) + fadeIn(tween(500)),
-                exit = scaleOut(tween(500)) + fadeOut(tween(500))
             ) {
-                Text(" Or ",
-                    style = textStyle,
+                Row(
                     modifier = Modifier
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState("or"),
                             animatedVisibilityScope = animatedVisibilityScope,
-                            boundsTransform = boundsTransformTween,
+                            boundsTransform = { _, _ ->
+                                spring(
+                                    dampingRatio = 1f,
+                                    stiffness = 20f,
+                                    visibilityThreshold = Rect.VisibilityThreshold
+                                )
+                            },
+                            enter = slideInHorizontally(
+                                initialOffsetX = { -it },
+                                animationSpec = AnimationSpecs.tweenIntOffset
+                            ) + scaleIn(
+                                animationSpec = AnimationSpecs.tweenFloat,
+                            )
                         )
-                )
+
+                ) {
+
+                    Text(
+                        text = " O",
+                        style = textStyle,
+                        modifier = Modifier
+                            .sharedBounds(
+                                sharedContentState = rememberSharedContentState("lookahead"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                boundsTransform = boundsTransformTween,
+                            )
+                    )
+                    Text("r ", style = textStyle)
+                }
             }
 
             Column(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .weight(1f)
+                modifier = Modifier.weight(1f)
             ) {
                 Text(
                     "Tween",
@@ -139,6 +173,12 @@ fun Slide2(
                             sharedContentState = rememberSharedContentState("tween"),
                             animatedVisibilityScope = animatedVisibilityScope,
                             boundsTransform = boundsTransformTween,
+                            enter = slideInHorizontally(
+                                initialOffsetX = { -it },
+                                animationSpec = AnimationSpecs.tweenIntOffset
+                            ) + scaleIn(
+                                animationSpec = AnimationSpecs.tweenFloat,
+                            )
                         )
                 )
                 AnimatedVisibility(
@@ -200,7 +240,7 @@ fun PointReveal(
 ) {
     val zeroSpacingTextStyle = subTextStyle.copy(letterSpacing = 0.sp)
     val initialDelay by remember { mutableLongStateOf(500) }
-    val letterDelay by remember { mutableLongStateOf(50) }
+    val letterDelay by remember { mutableLongStateOf(100) }
     FlowRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(
@@ -296,13 +336,12 @@ fun ScaleAnimationText(
         label = "scale animation",
         transitionSpec = {
             spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
+                dampingRatio = Spring.DampingRatioLowBouncy,
                 stiffness = Spring.StiffnessVeryLow
             )
         },
     ) { visible ->
-        val initialScale = 2f
-        if (visible) 1f else initialScale
+        if (visible) 1f else 2f
     }
 
     Text(

@@ -83,10 +83,19 @@ val textStyle = TextStyle(
 )
 
 @OptIn(ExperimentalSharedTransitionApi::class)
-val boundsTransform = BoundsTransform { initialBounds: Rect, targetBounds: Rect ->
+private val animationBoundsTransform = BoundsTransform { initialBounds: Rect, targetBounds: Rect ->
     spring(
         dampingRatio = Spring.DampingRatioLowBouncy,
         stiffness = Spring.StiffnessLow,
+        visibilityThreshold = Rect.VisibilityThreshold
+    )
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+private val titleBoundsTransform = BoundsTransform { initialBounds, targetBounds ->
+    spring(
+        dampingRatio = 1f,
+        stiffness = Spring.StiffnessVeryLow,
         visibilityThreshold = Rect.VisibilityThreshold
     )
 }
@@ -136,7 +145,7 @@ private fun TitleLayout(
                 modifier = Modifier.sharedBounds(
                     sharedContentState = rememberSharedContentState("animations"),
                     animatedVisibilityScope = animatedVisibilityScope,
-                    boundsTransform = boundsTransform
+                    boundsTransform = animationBoundsTransform
                 )
             ) {
                 Text("Anima", style = textStyle)
@@ -146,14 +155,7 @@ private fun TitleLayout(
                             sharedContentState = rememberSharedContentState("tween"),
                             animatedVisibilityScope = animatedVisibilityScope,
                             resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                            boundsTransform = BoundsTransform { initialBounds, targetBounds ->
-                                spring(
-                                    dampingRatio = 1f,
-                                    stiffness = Spring.StiffnessVeryLow,
-                                    visibilityThreshold = Rect.VisibilityThreshold
-                                )
-                            }
-                        )
+                            boundsTransform = titleBoundsTransform                        )
                 )
                 Text("i", style = textStyle)
                 Text(
@@ -162,14 +164,7 @@ private fun TitleLayout(
                             sharedContentState = rememberSharedContentState("or"),
                             animatedVisibilityScope = animatedVisibilityScope,
                             resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                            boundsTransform = BoundsTransform { initialBounds, targetBounds ->
-                                spring(
-                                    dampingRatio = 1f,
-                                    stiffness = Spring.StiffnessVeryLow,
-                                    visibilityThreshold = Rect.VisibilityThreshold
-                                )
-                            }
-                        )
+                            boundsTransform = titleBoundsTransform                        )
                 )
                 Text("n", style = textStyle)
                 Text(
@@ -178,14 +173,7 @@ private fun TitleLayout(
                             sharedContentState = rememberSharedContentState("spring"),
                             animatedVisibilityScope = animatedVisibilityScope,
                             resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                            boundsTransform = BoundsTransform { initialBounds, targetBounds ->
-                                spring(
-                                    dampingRatio = 1f,
-                                    stiffness = Spring.StiffnessVeryLow,
-                                    visibilityThreshold = Rect.VisibilityThreshold
-                                )
-                            }
-                        )
+                            boundsTransform = titleBoundsTransform                        )
                 )
             }
             AnimatedVisibility(visible = !swap) {

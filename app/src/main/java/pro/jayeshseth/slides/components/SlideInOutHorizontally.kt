@@ -4,8 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,6 +14,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import pro.jayeshseth.slides.utils.AnimationSpecs
 
 @Composable
 fun SlideInOutHorizontalFromLeft(
@@ -23,15 +22,15 @@ fun SlideInOutHorizontalFromLeft(
     modifier: Modifier = Modifier,
     enter: EnterTransition = slideInHorizontally(
         initialOffsetX = { -it },
-        animationSpec = tween(1200, easing = CubicBezierEasing(0.4f, 1.0f, 1.0f, 1.0f))
+        animationSpec = AnimationSpecs.tweenIntOffset
     ) + scaleIn(
-        animationSpec = tween(1200, easing = CubicBezierEasing(0.4f, 1.0f, 1.0f, 1.0f)),
+        animationSpec = AnimationSpecs.tweenFloat,
     ),
     exit: ExitTransition = slideOutHorizontally(
         targetOffsetX = { -it },
-        animationSpec = tween(1200, easing = CubicBezierEasing(0.4f, 1.0f, 1.0f, 1.0f))
+        animationSpec = AnimationSpecs.tweenIntOffset
     ) + scaleOut(
-        animationSpec = tween(1200, easing = CubicBezierEasing(0.4f, 1.0f, 1.0f, 1.0f))
+        animationSpec = AnimationSpecs.tweenFloat
     ),
     content: @Composable AnimatedVisibilityScope.() -> Unit
 ) {
@@ -50,15 +49,15 @@ fun SlideInOutHorizontalFromRight(
     modifier: Modifier = Modifier,
     enter: EnterTransition = slideInHorizontally(
         initialOffsetX = { it },
-        animationSpec = tween(1200)
+        animationSpec = AnimationSpecs.tweenIntOffset
     ) + scaleIn(
-        animationSpec = tween(1200),
+        animationSpec = AnimationSpecs.tweenFloat,
     ) + fadeIn(),
     exit: ExitTransition = slideOutHorizontally(
         targetOffsetX = { it },
-        animationSpec = tween(1200)
+        animationSpec = AnimationSpecs.tweenIntOffset
     ) + scaleOut(
-        animationSpec = tween(1200),
+        animationSpec = AnimationSpecs.tweenFloat,
     ),
     content: @Composable AnimatedVisibilityScope.() -> Unit
 ) {
