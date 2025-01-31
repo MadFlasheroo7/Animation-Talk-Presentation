@@ -5,14 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavDestination
 import pro.jayeshseth.slides.navigation.Slide1
 import pro.jayeshseth.slides.navigation.Slide2
+import pro.jayeshseth.slides.navigation.Slide3
 import pro.jayeshseth.slides.navigation.StartPage
 import pro.jayeshseth.slides.utils.Slide1TvChannels
 import pro.jayeshseth.slides.utils.states.Slide1State
 import pro.jayeshseth.slides.utils.states.Slide2State
+import pro.jayeshseth.slides.utils.states.Slide3State
 
 class GlobalNavigatorViewModel : ViewModel() {
     val slide1State = mutableStateOf(Slide1State())
     val slide2State = mutableStateOf(Slide2State())
+    val slide3State = mutableStateOf(Slide3State())
 
     fun onGlobalForward(
         navAction: (Any) -> Unit,
@@ -32,7 +35,15 @@ class GlobalNavigatorViewModel : ViewModel() {
             }
 
             currentRoute.route?.equals(routeName(Slide2.serializer())) == true -> {
-                slide2State.value.handleClick()
+                if (slide2State.value.showThirdPoint.value) {
+                    navAction(Slide3)
+                } else {
+                    slide2State.value.handleClick()
+                }
+            }
+
+            currentRoute.route?.equals(routeName(Slide3.serializer())) == true -> {
+                slide3State.value.handleClick()
             }
         }
     }
@@ -54,6 +65,12 @@ class GlobalNavigatorViewModel : ViewModel() {
                 if (slide2State.value.clickCounter.intValue != 0)
                     slide2State.value.reverseClick()
                 else navAction(Slide1)
+            }
+
+            currentRoute.route?.equals(routeName(Slide3.serializer())) == true -> {
+                if (slide3State.value.clickCounter.intValue != 0)
+                    slide3State.value.handleReverseClick()
+                else navAction(Slide2)
             }
         }
     }

@@ -12,22 +12,25 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import pro.jayeshseth.slides.screens.Slide1
 import pro.jayeshseth.slides.screens.Slide2
+import pro.jayeshseth.slides.screens.Slide3
 import pro.jayeshseth.slides.screens.StartPage
 import pro.jayeshseth.slides.utils.states.Slide1State
 import pro.jayeshseth.slides.utils.states.Slide2State
+import pro.jayeshseth.slides.utils.states.Slide3State
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun NavGraph(
     slide1State: Slide1State,
     slide2State: Slide2State,
+    slide3State: Slide3State,
     navController: NavHostController,
     sharedTransitionScope: SharedTransitionScope,
     modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = StartPage,
+        startDestination = Slide3,
         modifier = modifier
     ) {
         composable<StartPage>(
@@ -50,20 +53,7 @@ fun NavGraph(
                 animatedVisibilityScope = this
             )
         }
-        composable<Slide1>(
-            enterTransition = {
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(400, easing = LinearEasing)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(400, easing = LinearEasing)
-                )
-            }
-        ) {
+        composable<Slide1>() {
             Slide1(
                 slide1State = slide1State,
                 sharedTransitionScope = sharedTransitionScope,
@@ -73,7 +63,16 @@ fun NavGraph(
 
         composable<Slide2> {
             Slide2(
-                slide2State, sharedTransitionScope = sharedTransitionScope,
+                slide2State = slide2State,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = this
+            )
+        }
+
+        composable<Slide3> {
+            Slide3(
+                slide3State = slide3State,
+                sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = this
             )
         }

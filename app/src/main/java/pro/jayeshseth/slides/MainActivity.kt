@@ -81,6 +81,7 @@ class MainActivity : ComponentActivity() {
                             NavGraph(
                                 slide1State = viewModel.slide1State.value,
                                 slide2State = viewModel.slide2State.value,
+                                slide3State = viewModel.slide3State.value,
                                 navController = navController,
                                 sharedTransitionScope = this@SharedTransitionLayout
                             )
