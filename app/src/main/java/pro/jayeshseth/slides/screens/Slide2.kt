@@ -55,7 +55,7 @@ import pro.jayeshseth.slides.utils.states.Slide2State
 // tween vs spring
 
 val subTextStyle = TextStyle(
-    fontSize = 24.sp,
+    fontSize = 25.sp,
     color = Color.White,
     fontWeight = FontWeight.Medium,
     textMotion = TextMotion.Animated
@@ -110,9 +110,9 @@ fun Slide2(
                 ) {
                     Text(
                         "Spring",
-                        style = textStyle,
+                        style = textStyle
 
-                        )
+                    )
                 }
                 AnimatedVisibility(
                     slide2State.showSpringInfo.value,
@@ -232,6 +232,7 @@ private fun calcSpaceWidth(textStyle: TextStyle): Dp {
     return with(LocalDensity.current) { textLayoutResult.size.width.toDp() }
 }
 
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PointReveal(
@@ -265,6 +266,10 @@ fun PointReveal(
     }
 }
 
+private enum class AnimationState {
+    Idle, Animating, Revealed
+}
+
 @Composable
 fun AnimatedSubtext(
     text: String,
@@ -273,13 +278,15 @@ fun AnimatedSubtext(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = subTextStyle,
 ) {
-    var isAnimating by remember { mutableStateOf(false) }
+    var animationState by remember { mutableStateOf(AnimationState.Idle) }
+
     LaunchedEffect(text) {
         delay(initialDelay)
-        isAnimating = true
+        animationState = AnimationState.Animating
+
     }
 
-    if (isAnimating) {
+    if (animationState == AnimationState.Animating) {
         Row(
             modifier = modifier,
             verticalAlignment = Alignment.Bottom,
@@ -288,6 +295,12 @@ fun AnimatedSubtext(
                 var isVisible by remember { mutableStateOf(false) }
                 val transition =
                     updateTransition(targetState = isVisible, label = "visibility transition")
+
+                LaunchedEffect(index, transition.currentState, transition.targetState) {
+                    if (index == text.indices.last && transition.currentState == transition.targetState && isVisible) {
+                        animationState = AnimationState.Revealed
+                    }
+                }
 
                 LaunchedEffect(index) {
                     delay(timeMillis = index * letterDelay)
@@ -304,11 +317,12 @@ fun AnimatedSubtext(
         }
 
     } else {
+        val alpha = if (animationState == AnimationState.Revealed) 1f else 0f
         Text(
             text = text,
             style = textStyle,
             modifier = Modifier
-                .alpha(0f),
+                .alpha(alpha),
         )
     }
 

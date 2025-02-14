@@ -15,16 +15,13 @@ import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.expandIn
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -228,6 +225,8 @@ fun LookaheadPointsLayout(
                     )
             )
             Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(vertical = 12.dp)
@@ -258,19 +257,29 @@ fun LookaheadPointsLayout(
                     modifier = Modifier.weight(1f)
 
                 ) {
-                    this@Row.AnimatedVisibility(
+                    PointRevelVisibility(
                         slide3State.showPoint1.value,
-                        enter = fadeIn() + expandHorizontally(),
-                        exit = fadeOut() + shrinkHorizontally(),
-                    ) {
-                        PointReveal(
-                            "- Velocity/physics based",
-                        )
-                    }
-
+                        "- LookaheadScope provides info about child element bounds in parent layout."
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PointRevelVisibility(
+    visible: Boolean,
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    AnimatedVisibility(
+        visible = visible,
+        modifier = modifier,
+        enter = fadeIn() + expandHorizontally(),
+        exit = fadeOut() + shrinkHorizontally(),
+    ) {
+        PointReveal(text)
     }
 }
 
