@@ -12,4 +12,7 @@ object Slide1 // Why animation first ui
 object Slide2 // tween vs spring
 
 @Serializable
-object Slide3
+object Slide3 // lookahead scope
+
+@Serializable
+object Slide4 // Shaders
