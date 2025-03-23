@@ -1,5 +1,7 @@
 package pro.jayeshseth.slides.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -13,24 +15,28 @@ import androidx.navigation.compose.composable
 import pro.jayeshseth.slides.screens.Slide1
 import pro.jayeshseth.slides.screens.Slide2
 import pro.jayeshseth.slides.screens.Slide3
+import pro.jayeshseth.slides.screens.Slide4
 import pro.jayeshseth.slides.screens.StartPage
 import pro.jayeshseth.slides.utils.states.Slide1State
 import pro.jayeshseth.slides.utils.states.Slide2State
 import pro.jayeshseth.slides.utils.states.Slide3State
+import pro.jayeshseth.slides.utils.states.Slide4SlideState
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun NavGraph(
     slide1State: Slide1State,
     slide2State: Slide2State,
     slide3State: Slide3State,
+    slide4State: Slide4SlideState,
     navController: NavHostController,
     sharedTransitionScope: SharedTransitionScope,
     modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = Slide3,
+        startDestination = Slide4,
         modifier = modifier
     ) {
         composable<StartPage>(
@@ -72,6 +78,14 @@ fun NavGraph(
         composable<Slide3> {
             Slide3(
                 slide3State = slide3State,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = this
+            )
+        }
+
+        composable<Slide4> {
+            Slide4(
+                slide4State = slide4State,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = this
             )

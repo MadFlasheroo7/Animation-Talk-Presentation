@@ -82,6 +82,7 @@ class MainActivity : ComponentActivity() {
                                 slide1State = viewModel.slide1State.value,
                                 slide2State = viewModel.slide2State.value,
                                 slide3State = viewModel.slide3State.value,
+                                slide4State = viewModel.slide4State.value,
                                 navController = navController,
                                 sharedTransitionScope = this@SharedTransitionLayout
                             )
