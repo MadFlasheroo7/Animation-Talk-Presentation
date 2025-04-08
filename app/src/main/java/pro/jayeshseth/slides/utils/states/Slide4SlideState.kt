@@ -15,6 +15,9 @@ class Slide4SlideState : SlideStateHandler() {
     var shaderPoint = mutableStateOf<ShaderPoints?>(null)
         private set
 
+    var agslPoint = mutableStateOf<AgslPoints?>(null)
+        private set
+
     override fun onForwardClick(count: Int) {
         when (count) {
             1 -> {
@@ -24,6 +27,7 @@ class Slide4SlideState : SlideStateHandler() {
             2 -> { shaderPointsLayout.value = Slide4Layouts.WHAT_IS_SHADER }
             3 -> { if (shaderPointsLayout.value == Slide4Layouts.WHAT_IS_SHADER) updateShaderPoints() }
             4 -> { shaderPointsLayout.value = Slide4Layouts.AGSL }
+            5 -> { if (shaderPointsLayout.value == Slide4Layouts.AGSL) updateAgslPoints() }
         }
     }
 
@@ -50,5 +54,21 @@ class Slide4SlideState : SlideStateHandler() {
         }
         if (shaderPoint.value != null && shaderPoint.value != ShaderPoints.Agsl)
             clickCounter.intValue = 2
+    }
+
+    private fun updateAgslPoints() {
+        agslPoint.value = when (agslPoint.value) {
+            AgslPoints.RuntimeShaderApi -> AgslPoints.GraphicsLayer
+            AgslPoints.GraphicsLayer -> AgslPoints.WhyAGSL
+            AgslPoints.WhyAGSL -> AgslPoints.WhyAGSL2
+            AgslPoints.WhyAGSL2 -> AgslPoints.Qualifiers
+            AgslPoints.Qualifiers -> AgslPoints.ColorSpace
+            AgslPoints.ColorSpace -> AgslPoints.WhyNot
+            AgslPoints.WhyNot -> AgslPoints.WhyNot2
+            AgslPoints.WhyNot2 -> null
+            null -> AgslPoints.RuntimeShaderApi
+        }
+//        if (agslPoint.value != null && agslPoint.value != AgslPoints.WhyNot)
+            clickCounter.intValue = 4
     }
 }

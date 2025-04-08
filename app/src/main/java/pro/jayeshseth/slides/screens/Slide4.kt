@@ -1,5 +1,6 @@
 package pro.jayeshseth.slides.screens
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -31,12 +32,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -117,7 +118,7 @@ fun Slide4(
             }
 
             Slide4Layouts.AGSL -> {
-                Button({}) { Text("Agsl") }
+                AgslLayout(slide4State)
             }
 
             Slide4Layouts.NONE -> {}
@@ -167,7 +168,7 @@ private fun TitleLayout(
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun ShaderPoints(
+private fun ShaderPoints(
     slide4State: Slide4SlideState,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
@@ -251,4 +252,99 @@ fun ShaderPoints(
             }
         }
     }
+}
+
+
+@Composable
+private fun AgslLayout(
+    slide4State: Slide4SlideState,
+    modifier: Modifier = Modifier
+) {
+    val imgPoint = slide4State.agslPoint.value?.images
+
+    val textPoint = slide4State.agslPoint.value?.point ?: ""
+
+
+    Log.d("slide4", "count: ${slide4State.clickCounter.intValue}, text: $textPoint")
+    val infiniteTransition = rememberInfiniteTransition(label = "text gradient animation")
+    val offset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 5_000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = ""
+    )
+    val brush = remember(offset) {
+        object : ShaderBrush() {
+            override fun createShader(size: Size): Shader {
+                val widthOffset = size.width * offset
+                val heightOffset = size.height * offset
+                return LinearGradientShader(
+                    colors = listOf(
+                        Color(0xFFFFFFFF),
+                        Color(0xFF8A8A8A),
+                        Color(0xFF000000)
+                    ),
+                    from = Offset(widthOffset, heightOffset),
+                    to = Offset(widthOffset + size.width, heightOffset + size.height),
+                    tileMode = TileMode.Mirror
+                )
+            }
+        }
+
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .animateContentSize()
+    ) {
+        Text(
+            text = "AGSL",
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+            style = TextStyle(
+                fontSize = 80.sp,
+                brush = brush,
+                fontWeight = FontWeight.ExtraBold,
+                textMotion = TextMotion.Animated
+            ),
+            modifier = Modifier
+//                .sharedBounds(
+//                    sharedContentState = rememberSharedContentState("multishader"),
+//                    animatedVisibilityScope = animatedVisibilityScope,
+//                    boundsTransform = boundsTransform,
+//                )
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .weight(1f)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                imgPoint?.first?.let {
+                    ImageRenderer(it)
+                }
+                imgPoint?.second?.let {
+                    ImageRenderer(it)
+                }
+            }
+            AgslTextDisplay(
+                textPoint,
+                Modifier.weight(0.8f)
+            )
+        }
+    }
+
 }

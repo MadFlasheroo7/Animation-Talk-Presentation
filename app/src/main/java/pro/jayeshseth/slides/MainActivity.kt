@@ -94,6 +94,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * fetching the route name from the serializer obj
+ */
 @OptIn(ExperimentalSerializationApi::class)
 inline fun <reified T : Any> routeName(serializer: SerializationStrategy<T>): String {
     return serializer.descriptor.serialName
