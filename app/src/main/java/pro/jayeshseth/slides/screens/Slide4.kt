@@ -27,11 +27,13 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +41,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -55,7 +58,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import pro.jayeshseth.slides.components.AgslTextDisplay
+import pro.jayeshseth.slides.components.CurtainLayout
 import pro.jayeshseth.slides.components.ImageRenderer
 import pro.jayeshseth.slides.components.MultiShaderRevealText
 import pro.jayeshseth.slides.components.customBlur
@@ -72,10 +77,47 @@ private val boundsTransform = BoundsTransform { initialBounds: Rect, targetBound
     )
 }
 
-// Shaders
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Slide4(
+    modifier: Modifier = Modifier,
+    slide4State: Slide4SlideState = Slide4SlideState(),
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
+    CurtainLayout(
+        modifier = modifier.fillMaxSize(),
+        content = {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                var show by remember { mutableStateOf(false) }
+                LaunchedEffect(true) {
+                    delay(1000)
+                    show = true
+                }
+                AnimatedVisibility(
+                    show
+                ) {
+                    Button({}) { Text("button") }
+                }
+            }
+        }
+    ) {
+        Slide(
+            slide4State = slide4State,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedVisibilityScope = animatedVisibilityScope
+        )
+
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun Slide(
     modifier: Modifier = Modifier,
     slide4State: Slide4SlideState = Slide4SlideState(),
     sharedTransitionScope: SharedTransitionScope,
