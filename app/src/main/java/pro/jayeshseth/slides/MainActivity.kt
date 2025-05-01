@@ -70,13 +70,12 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                 ) {
                     SharedTransitionLayout {
-
                         Box {
                             Box(
                                 Modifier
                                     .fillMaxSize()
                                     .blur(12.dp)
-                                    .shaderBackground(InkFlow, speed = 0.3f)
+                                    .shaderBackground(InkFlow, speed = 0.2f)
                             )
                             NavGraph(
                                 slide1State = viewModel.slide1State.value,

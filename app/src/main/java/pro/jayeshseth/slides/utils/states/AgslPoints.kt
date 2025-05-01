@@ -5,7 +5,7 @@ import pro.jayeshseth.slides.R
 sealed class AgslPoints(val point: String, val images: ShaderPointsImage) {
     data object RuntimeShaderApi : AgslPoints("Runtime Shader API\n SKSL & GLSL.", ShaderPointsImage(R.raw.cpu, R.raw.gpu))
     data object GraphicsLayer : AgslPoints("Render Node\n alpha, scale, composition strategy.", ShaderPointsImage(R.raw.simulation, R.raw.blue_circle))
-    data object WhyAGSL : AgslPoints("Modify the visual of the component, ripple, smoother animation...", ShaderPointsImage(R.raw.simulation, R.raw.blue_circle))
+    data object WhyAGSL : AgslPoints("Modifys the visual of the component, ripple, smoother animation...", ShaderPointsImage(R.raw.simulation, R.raw.blue_circle))
     data object WhyAGSL2 : AgslPoints("why AGSL", ShaderPointsImage(R.raw.simulation, R.raw.blue_circle))
     data object Qualifiers : AgslPoints("Qualifiers: In, Out, InOut", ShaderPointsImage(R.raw.simulation, R.raw.blue_circle))
 

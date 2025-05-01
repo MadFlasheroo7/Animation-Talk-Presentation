@@ -18,10 +18,13 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,7 +53,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import pro.jayeshseth.slides.components.ChalkBoard
 import pro.jayeshseth.slides.components.RetroTV
+import pro.jayeshseth.slides.ui.theme.chalk_font
 import pro.jayeshseth.slides.utils.AnimationSpecs
+import pro.jayeshseth.slides.utils.states.LookaheadPoints
 import pro.jayeshseth.slides.utils.states.Slide3State
 
 // text field animation not any more
@@ -214,16 +219,29 @@ fun LookaheadPointsLayout(
                 .padding(vertical = 10.dp)
                 .animateContentSize()
         ) {
-            Text(
-                "LookaheadScope",
-                style = textStyle,
-                modifier = Modifier
-                    .sharedBounds(
-                        sharedContentState = rememberSharedContentState("lookaheadscope"),
-                        animatedVisibilityScope = animatedVisibilityScope,
-                        boundsTransform = boundsTransform,
-                    )
-            )
+            if (slide3State.clickCounter.intValue < 4) {
+                Text(
+                    "LookaheadScope",
+                    style = textStyle,
+                    modifier = Modifier
+                        .sharedBounds(
+                            sharedContentState = rememberSharedContentState("lookaheadscope"),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = boundsTransform,
+                        )
+                )
+            } else {
+                Text(
+                    "Shared Transition",
+                    style = textStyle,
+                    modifier = Modifier
+                        .sharedBounds(
+                            sharedContentState = rememberSharedContentState("lookaheadscope"),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = boundsTransform,
+                        )
+                )
+            }
             Row(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -235,32 +253,107 @@ fun LookaheadPointsLayout(
                 RetroTV(
                     modifier = Modifier.weight(1f)
                 ) {
-                    LookaheadScopeAnimation(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .fillMaxSize()
-                            .sharedBounds(
-                                sharedContentState = rememberSharedContentState("animatedBox"),
-                                animatedVisibilityScope = animatedVisibilityScope,
-                                resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                                boundsTransform = { _, _ ->
-                                    spring(
-                                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                                        stiffness = Spring.StiffnessVeryLow,
-                                        visibilityThreshold = Rect.VisibilityThreshold
-                                    )
-                                },
-                            )
-                    )
+                    AnimatedContent(
+                        targetState = slide3State.lookaheadPoints.value,
+                        transitionSpec = {
+                            scaleIn() togetherWith scaleOut()
+                        },
+                        label = "animate tv"
+                    ) {
+                        when (it) {
+                            LookaheadPoints.WhatIsLookahead -> {
+                                LookaheadScopeAnimation(
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .fillMaxSize()
+                                        .sharedBounds(
+                                            sharedContentState = rememberSharedContentState("animatedBox"),
+                                            animatedVisibilityScope = animatedVisibilityScope,
+                                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                                            boundsTransform = { _, _ ->
+                                                spring(
+                                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                    stiffness = Spring.StiffnessVeryLow,
+                                                    visibilityThreshold = Rect.VisibilityThreshold
+                                                )
+                                            },
+                                        )
+                                )
+                            }
+                            LookaheadPoints.PreCalculateLayout -> {
+                                LookaheadScopeAnimation(
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .fillMaxSize()
+                                        .sharedBounds(
+                                            sharedContentState = rememberSharedContentState("animatedBox"),
+                                            animatedVisibilityScope = animatedVisibilityScope,
+                                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                                            boundsTransform = { _, _ ->
+                                                spring(
+                                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                    stiffness = Spring.StiffnessVeryLow,
+                                                    visibilityThreshold = Rect.VisibilityThreshold
+                                                )
+                                            },
+                                        )
+                                )
+                            }
+                            LookaheadPoints.SharedTransition -> {
+                                LookaheadScopeAnimation(
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .fillMaxSize()
+                                        .sharedBounds(
+                                            sharedContentState = rememberSharedContentState("animatedBox"),
+                                            animatedVisibilityScope = animatedVisibilityScope,
+                                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                                            boundsTransform = { _, _ ->
+                                                spring(
+                                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                    stiffness = Spring.StiffnessVeryLow,
+                                                    visibilityThreshold = Rect.VisibilityThreshold
+                                                )
+                                            },
+                                        )
+                                )
+                            }
+                        }
+                    }
                 }
                 ChalkBoard(
                     modifier = Modifier.weight(1f)
-
                 ) {
-                    PointRevelVisibility(
-                        slide3State.showPoint1.value,
-                        "- LookaheadScope provides info about child element bounds in parent layout."
-                    )
+                    AnimatedContent(
+                        modifier = Modifier.align(Alignment.Center),
+                        targetState = slide3State.lookaheadPoints.value,
+                        transitionSpec = {
+                            scaleIn() togetherWith scaleOut()
+                        },
+                        label = "animate tv"
+                    ) {
+                        when(it) {
+                            LookaheadPoints.WhatIsLookahead -> {
+                                PointRevelVisibility(
+                                    true,
+                                    it.point
+                                )
+                            }
+                            LookaheadPoints.PreCalculateLayout -> {
+                                PointRevelVisibility(
+                                    true,
+                                    it.point
+                                )
+                            }
+                            LookaheadPoints.SharedTransition -> {
+                                PointRevelVisibility(
+                                    true,
+                                    it.point
+                                )
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -279,7 +372,7 @@ fun PointRevelVisibility(
         enter = fadeIn() + expandHorizontally(),
         exit = fadeOut() + shrinkHorizontally(),
     ) {
-        PointReveal(text)
+        PointReveal(text, subTextStyle.copy(fontFamily = chalk_font))
     }
 }
 

@@ -14,12 +14,20 @@ class Slide3State {
         private set
     var clickCounter = mutableIntStateOf(0)
 
+    var lookaheadPoints =
+        mutableStateOf<LookaheadPoints>(LookaheadPoints.WhatIsLookahead)
+
+    var sharedTransitionPoints =
+        mutableStateOf<SharedTransitionPoints>(SharedTransitionPoints.SharedTransitionScope)
     fun handleClick() {
         clickCounter.intValue++
         when (clickCounter.intValue) {
             1 -> showSharedTransition.value = false
             2 -> showPoints.value = true
-            3 -> showPoint1.value = true
+            3 -> {
+                updateLookaheadPoints()
+            }
+            4 -> upgradeShredTransitionPoints()
         }
     }
 
@@ -30,14 +38,34 @@ class Slide3State {
                 showPoint1.value = false
                 clickCounter.intValue = 2
             }
+
             2 -> {
                 showPoints.value = false
                 clickCounter.intValue = 1
             }
+
             1 -> {
                 showSharedTransition.value = true
                 clickCounter.intValue = 0
             }
         }
+    }
+
+    fun upgradeShredTransitionPoints() {
+
+    }
+
+    fun updateLookaheadPoints() {
+        lookaheadPoints.value = when (lookaheadPoints.value) {
+            LookaheadPoints.WhatIsLookahead ->
+                LookaheadPoints.PreCalculateLayout
+
+            LookaheadPoints.PreCalculateLayout ->
+                LookaheadPoints.SharedTransition
+
+            LookaheadPoints.SharedTransition -> LookaheadPoints.WhatIsLookahead
+        }
+        if (lookaheadPoints.value != LookaheadPoints.SharedTransition) clickCounter.intValue = 2
+
     }
 }

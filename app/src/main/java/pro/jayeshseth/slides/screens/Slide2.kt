@@ -55,7 +55,7 @@ import pro.jayeshseth.slides.utils.states.Slide2State
 // tween vs spring
 
 val subTextStyle = TextStyle(
-    fontSize = 25.sp,
+    fontSize = 24.sp,
     color = Color.White,
     fontWeight = FontWeight.Medium,
     textMotion = TextMotion.Animated
@@ -237,9 +237,10 @@ private fun calcSpaceWidth(textStyle: TextStyle): Dp {
 @Composable
 fun PointReveal(
     text: String,
+    textStyle: TextStyle = subTextStyle,
     modifier: Modifier = Modifier
 ) {
-    val zeroSpacingTextStyle = subTextStyle.copy(letterSpacing = 0.sp)
+    val zeroSpacingTextStyle = textStyle.copy(letterSpacing = 0.sp)
     val initialDelay by remember { mutableLongStateOf(500) }
     val letterDelay by remember { mutableLongStateOf(100) }
     FlowRow(
@@ -310,6 +311,7 @@ fun AnimatedSubtext(
                 ScaleAnimationText(
                     text = char.toString(),
                     transition = transition,
+                    textStyle = textStyle,
                     modifier = Modifier
                 )
 
@@ -331,6 +333,7 @@ fun AnimatedSubtext(
 @Composable
 fun ScaleAnimationText(
     text: String,
+    textStyle: TextStyle,
     transition: Transition<Boolean>,
     modifier: Modifier = Modifier
 ) {
@@ -365,7 +368,7 @@ fun ScaleAnimationText(
             this.scaleX = scale
             this.scaleY = scale
         },
-        style = subTextStyle,
+        style = textStyle,
     )
 
 }

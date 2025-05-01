@@ -1,4 +1,4 @@
-package pro.jayeshseth.slides.utils
+package pro.jayeshseth.slides.utils.states
 
 sealed class Slide1TvChannels(val title: String?) {
     data object LOADING : Slide1TvChannels(null)

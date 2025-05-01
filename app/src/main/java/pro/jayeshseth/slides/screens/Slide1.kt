@@ -73,7 +73,7 @@ import pro.jayeshseth.slides.components.SlideInOutHorizontalFromLeft
 import pro.jayeshseth.slides.components.SlideInOutHorizontalFromRight
 import pro.jayeshseth.slides.components.StaticEffect
 import pro.jayeshseth.slides.ui.theme.chalk_font
-import pro.jayeshseth.slides.utils.Slide1TvChannels
+import pro.jayeshseth.slides.utils.states.Slide1TvChannels
 import pro.jayeshseth.slides.utils.states.Slide1State
 
 val textStyle = TextStyle(

@@ -3,7 +3,6 @@ package pro.jayeshseth.slides.utils.states
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import pro.jayeshseth.slides.utils.Slide1TvChannels
 
 class Slide1State {
     var swap = mutableStateOf(false)

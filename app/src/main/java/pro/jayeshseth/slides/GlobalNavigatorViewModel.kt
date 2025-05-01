@@ -8,7 +8,7 @@ import pro.jayeshseth.slides.navigation.Slide2
 import pro.jayeshseth.slides.navigation.Slide3
 import pro.jayeshseth.slides.navigation.Slide4
 import pro.jayeshseth.slides.navigation.StartPage
-import pro.jayeshseth.slides.utils.Slide1TvChannels
+import pro.jayeshseth.slides.utils.states.Slide1TvChannels
 import pro.jayeshseth.slides.utils.states.Slide1State
 import pro.jayeshseth.slides.utils.states.Slide2State
 import pro.jayeshseth.slides.utils.states.Slide3State
