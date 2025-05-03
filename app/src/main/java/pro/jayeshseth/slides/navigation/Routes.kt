@@ -16,3 +16,6 @@ object Slide3 // lookahead scope
 
 @Serializable
 object Slide4 // Shaders
+
+@Serializable
+object Slide5 // thank you

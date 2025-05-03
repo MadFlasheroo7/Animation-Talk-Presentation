@@ -1,6 +1,5 @@
 package pro.jayeshseth.slides.screens
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -33,7 +32,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -63,6 +61,7 @@ import pro.jayeshseth.slides.components.AgslTextDisplay
 import pro.jayeshseth.slides.components.CurtainLayout
 import pro.jayeshseth.slides.components.ImageRenderer
 import pro.jayeshseth.slides.components.MultiShaderRevealText
+import pro.jayeshseth.slides.components.RepoQr
 import pro.jayeshseth.slides.components.customBlur
 import pro.jayeshseth.slides.components.shaderTextGradient
 import pro.jayeshseth.slides.utils.states.Slide4Layouts
@@ -81,7 +80,7 @@ private val boundsTransform = BoundsTransform { initialBounds: Rect, targetBound
 @Composable
 fun Slide4(
     modifier: Modifier = Modifier,
-    slide4State: Slide4SlideState = Slide4SlideState(),
+    slide4State: Slide4SlideState,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
@@ -98,11 +97,7 @@ fun Slide4(
                     delay(1000)
                     show = true
                 }
-                AnimatedVisibility(
-                    show
-                ) {
-                    Button({}) { Text("button") }
-                }
+                RepoQr(show)
             }
         }
     ) {
@@ -111,7 +106,6 @@ fun Slide4(
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = animatedVisibilityScope
         )
-
     }
 }
 
@@ -306,8 +300,6 @@ private fun AgslLayout(
 
     val textPoint = slide4State.agslPoint.value?.point ?: ""
 
-
-    Log.d("slide4", "count: ${slide4State.clickCounter.intValue}, text: $textPoint")
     val infiniteTransition = rememberInfiniteTransition(label = "text gradient animation")
     val offset by infiniteTransition.animateFloat(
         initialValue = 0f,

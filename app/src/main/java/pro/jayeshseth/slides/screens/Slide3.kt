@@ -47,20 +47,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import pro.jayeshseth.slides.R
 import pro.jayeshseth.slides.components.ChalkBoard
+import pro.jayeshseth.slides.components.CoilGif
 import pro.jayeshseth.slides.components.RetroTV
 import pro.jayeshseth.slides.ui.theme.chalk_font
 import pro.jayeshseth.slides.utils.AnimationSpecs
 import pro.jayeshseth.slides.utils.states.LookaheadPoints
+import pro.jayeshseth.slides.utils.states.SharedTransitionPoints
 import pro.jayeshseth.slides.utils.states.Slide3State
 
-// text field animation not any more
-
-// look shared, shared transistion
 @OptIn(ExperimentalSharedTransitionApi::class)
 private val boundsTransform = BoundsTransform { initialBounds: Rect, targetBounds: Rect ->
     spring(
@@ -80,9 +81,7 @@ fun Slide3(
 ) {
     AnimatedContent(
         targetState = slide3State.showPoints.value,
-//        transitionSpec = {
-//            scaleIn() togetherWith scaleOut()
-//        },
+        transitionSpec = { fadeIn() togetherWith fadeOut() },
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 50.dp),
@@ -219,29 +218,94 @@ fun LookaheadPointsLayout(
                 .padding(vertical = 10.dp)
                 .animateContentSize()
         ) {
-            if (slide3State.clickCounter.intValue < 4) {
-                Text(
-                    "LookaheadScope",
-                    style = textStyle,
-                    modifier = Modifier
-                        .sharedBounds(
-                            sharedContentState = rememberSharedContentState("lookaheadscope"),
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            boundsTransform = boundsTransform,
+            AnimatedContent(
+                targetState = slide3State.showSharedPoints.value.not()
+            ) {
+                if (it) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .sharedBounds(
+                                sharedContentState = rememberSharedContentState("lookaheadscope"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                boundsTransform = boundsTransform,
+                            )
+                    ) {
+                        Text(
+                            "Look",
+                            style = textStyle,
                         )
-                )
-            } else {
-                Text(
-                    "Shared Transition",
-                    style = textStyle,
-                    modifier = Modifier
-                        .sharedBounds(
-                            sharedContentState = rememberSharedContentState("lookaheadscope"),
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            boundsTransform = boundsTransform,
+                        Text(
+                            "a",
+                            style = textStyle,
+                            modifier = Modifier
+                                .sharedBounds(
+                                    sharedContentState = rememberSharedContentState("a"),
+                                    animatedVisibilityScope = this@AnimatedContent,
+                                    boundsTransform = boundsTransform,
+                                )
                         )
-                )
+                        Text(
+                            "h",
+                            style = textStyle,
+                            modifier = Modifier
+                                .sharedBounds(
+                                    sharedContentState = rememberSharedContentState("h"),
+                                    animatedVisibilityScope = this@AnimatedContent,
+                                    boundsTransform = boundsTransform,
+                                )
+                        )
+                        Text(
+                            "ead", style = textStyle,
+                        )
+                        Text(
+                            " S", style = textStyle,
+                            modifier = Modifier
+                                .sharedBounds(
+                                    sharedContentState = rememberSharedContentState("s"),
+                                    animatedVisibilityScope = this@AnimatedContent,
+                                    boundsTransform = boundsTransform,
+                                )
+                        )
+                        Text(
+                            "cope", style = textStyle,
+                        )
+                    }
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            "S", style = textStyle,
+                            modifier = Modifier
+                                .sharedBounds(
+                                    sharedContentState = rememberSharedContentState("s"),
+                                    animatedVisibilityScope = this@AnimatedContent,
+                                    boundsTransform = boundsTransform,
+                                )
+                        )
+                        Text(
+                            "h", style = textStyle,
+                            modifier = Modifier
+                                .sharedBounds(
+                                    sharedContentState = rememberSharedContentState("h"),
+                                    animatedVisibilityScope = this@AnimatedContent,
+                                    boundsTransform = boundsTransform,
+                                )
+                        )
+                        Text(
+                            "a", style = textStyle,
+                            modifier = Modifier
+                                .sharedBounds(
+                                    sharedContentState = rememberSharedContentState("a"),
+                                    animatedVisibilityScope = this@AnimatedContent,
+                                    boundsTransform = boundsTransform,
+                                )
+                        )
+                        Text("red Transition", style = textStyle)
+                    }
+                }
+
             }
+
             Row(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -254,70 +318,22 @@ fun LookaheadPointsLayout(
                     modifier = Modifier.weight(1f)
                 ) {
                     AnimatedContent(
-                        targetState = slide3State.lookaheadPoints.value,
-                        transitionSpec = {
-                            scaleIn() togetherWith scaleOut()
-                        },
-                        label = "animate tv"
+                        modifier = Modifier.align(Alignment.Center),
+                        targetState = slide3State.showSharedPoints.value,
+                        transitionSpec = { fadeIn() togetherWith fadeOut() },
                     ) {
-                        when (it) {
-                            LookaheadPoints.WhatIsLookahead -> {
-                                LookaheadScopeAnimation(
-                                    modifier = Modifier
-                                        .align(Alignment.Center)
-                                        .fillMaxSize()
-                                        .sharedBounds(
-                                            sharedContentState = rememberSharedContentState("animatedBox"),
-                                            animatedVisibilityScope = animatedVisibilityScope,
-                                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                                            boundsTransform = { _, _ ->
-                                                spring(
-                                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                                    stiffness = Spring.StiffnessVeryLow,
-                                                    visibilityThreshold = Rect.VisibilityThreshold
-                                                )
-                                            },
-                                        )
-                                )
-                            }
-                            LookaheadPoints.PreCalculateLayout -> {
-                                LookaheadScopeAnimation(
-                                    modifier = Modifier
-                                        .align(Alignment.Center)
-                                        .fillMaxSize()
-                                        .sharedBounds(
-                                            sharedContentState = rememberSharedContentState("animatedBox"),
-                                            animatedVisibilityScope = animatedVisibilityScope,
-                                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                                            boundsTransform = { _, _ ->
-                                                spring(
-                                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                                    stiffness = Spring.StiffnessVeryLow,
-                                                    visibilityThreshold = Rect.VisibilityThreshold
-                                                )
-                                            },
-                                        )
-                                )
-                            }
-                            LookaheadPoints.SharedTransition -> {
-                                LookaheadScopeAnimation(
-                                    modifier = Modifier
-                                        .align(Alignment.Center)
-                                        .fillMaxSize()
-                                        .sharedBounds(
-                                            sharedContentState = rememberSharedContentState("animatedBox"),
-                                            animatedVisibilityScope = animatedVisibilityScope,
-                                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                                            boundsTransform = { _, _ ->
-                                                spring(
-                                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                                    stiffness = Spring.StiffnessVeryLow,
-                                                    visibilityThreshold = Rect.VisibilityThreshold
-                                                )
-                                            },
-                                        )
-                                )
-                            }
+                        if (it.not()) {
+                            LookaheadPointsTV(
+                                slide3State = slide3State,
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                sharedTransitionScope = sharedTransitionScope
+                            )
+                        } else {
+                            SharedTransitionPointsTV(
+                                slide3State = slide3State,
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                sharedTransitionScope = sharedTransitionScope
+                            )
                         }
                     }
                 }
@@ -326,35 +342,284 @@ fun LookaheadPointsLayout(
                 ) {
                     AnimatedContent(
                         modifier = Modifier.align(Alignment.Center),
-                        targetState = slide3State.lookaheadPoints.value,
-                        transitionSpec = {
-                            scaleIn() togetherWith scaleOut()
-                        },
+                        targetState = slide3State.showSharedPoints.value,
+                        transitionSpec = { fadeIn() togetherWith fadeOut() },
                         label = "animate tv"
                     ) {
-                        when(it) {
-                            LookaheadPoints.WhatIsLookahead -> {
-                                PointRevelVisibility(
-                                    true,
-                                    it.point
-                                )
-                            }
-                            LookaheadPoints.PreCalculateLayout -> {
-                                PointRevelVisibility(
-                                    true,
-                                    it.point
-                                )
-                            }
-                            LookaheadPoints.SharedTransition -> {
-                                PointRevelVisibility(
-                                    true,
-                                    it.point
-                                )
-                            }
+                        if (it.not()) {
+                            LookaheadPoints(
+                                slide3State = slide3State
+                            )
+                        } else {
+                            SharedTransitionPoints(
+                                slide3State = slide3State,
+                            )
                         }
                     }
-
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun LookaheadPoints(
+    slide3State: Slide3State,
+    modifier: Modifier = Modifier
+) {
+    AnimatedContent(
+        modifier = modifier,
+        targetState = slide3State.lookaheadPoints.value,
+        transitionSpec = {
+            scaleIn() togetherWith scaleOut()
+        },
+        label = "animate tv"
+    ) {
+        when (it) {
+            LookaheadPoints.WhatIsLookahead -> {
+                PointRevelVisibility(
+                    true,
+                    it.point
+                )
+            }
+
+            LookaheadPoints.PreCalculateLayout -> {
+                PointRevelVisibility(
+                    true,
+                    it.point
+                )
+            }
+
+            LookaheadPoints.WhyLookahead -> {
+                PointRevelVisibility(
+                    true,
+                    it.point
+                )
+            }
+
+            LookaheadPoints.SharedTransition -> {
+                PointRevelVisibility(
+                    true,
+                    it.point
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun LookaheadPointsTV(
+    slide3State: Slide3State,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    modifier: Modifier = Modifier
+) {
+    with(sharedTransitionScope) {
+        AnimatedContent(
+            modifier = modifier,
+            targetState = slide3State.lookaheadPoints.value,
+            transitionSpec = {
+                scaleIn() togetherWith scaleOut()
+            },
+            label = "animate tv"
+        ) {
+            when (it) {
+                LookaheadPoints.WhatIsLookahead -> {
+                    LookaheadScopeAnimation(
+                        modifier = modifier
+                            .fillMaxSize()
+                            .sharedBounds(
+                                sharedContentState = rememberSharedContentState("animatedBox"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                                boundsTransform = { _, _ ->
+                                    spring(
+                                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                                        stiffness = Spring.StiffnessVeryLow,
+                                        visibilityThreshold = Rect.VisibilityThreshold
+                                    )
+                                },
+                            )
+                    )
+                }
+
+                LookaheadPoints.PreCalculateLayout -> {
+                    CoilGif(
+                        R.raw.calc,
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                LookaheadPoints.SharedTransition -> {
+                    CoilGif(
+                        R.raw.shared_anim,
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                LookaheadPoints.WhyLookahead -> {
+                    CoilGif(
+                        R.raw.diagram,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                        contentDescription = "",
+                    )
+                }
+            }
+        }
+    }
+
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun SharedTransitionPointsTV(
+    slide3State: Slide3State,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    modifier: Modifier = Modifier
+) {
+    with(sharedTransitionScope) {
+        AnimatedContent(
+            modifier = modifier,
+            targetState = slide3State.sharedTransitionPoints.value,
+            transitionSpec = {
+                scaleIn() togetherWith scaleOut()
+            },
+            label = "animate tv"
+        ) {
+            when (it) {
+                SharedTransitionPoints.SharedTransitionScope -> {
+                    CoilGif(
+                        R.raw.shared_scope,
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                SharedTransitionPoints.SharedBounds -> {
+                    CoilGif(
+                        R.raw.shared_bounds,
+                        contentDescription = "",
+//                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                SharedTransitionPoints.SharedElements -> {
+                    CoilGif(
+                        R.raw.shared_element,
+                        contentDescription = "",
+//                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                SharedTransitionPoints.OverlayAndClip -> {
+                    CoilGif(
+                        R.raw.overlay,
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                SharedTransitionPoints.ZIndex -> {
+                    CoilGif(
+                        R.raw.overlay,
+                        contentDescription = "",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                SharedTransitionPoints.ScaleToBounds -> {
+                    CoilGif(
+                        R.raw.scale_to_bounds,
+                        contentDescription = "",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                SharedTransitionPoints.RemeasureToBounds -> {
+                    CoilGif(
+                        R.raw.remeasure_to_bounds,
+                        contentDescription = "",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+        }
+    }
+
+}
+
+@Composable
+fun SharedTransitionPoints(
+    slide3State: Slide3State,
+    modifier: Modifier = Modifier
+) {
+    AnimatedContent(
+        modifier = modifier,
+        targetState = slide3State.sharedTransitionPoints.value,
+        transitionSpec = {
+            scaleIn() togetherWith scaleOut()
+        },
+        label = "animate tv"
+    ) {
+        when (it) {
+            SharedTransitionPoints.SharedTransitionScope -> {
+                PointRevelVisibility(
+                    true,
+                    it.point
+                )
+            }
+
+            SharedTransitionPoints.OverlayAndClip -> {
+                PointRevelVisibility(
+                    true,
+                    it.point
+                )
+            }
+
+            SharedTransitionPoints.RemeasureToBounds -> {
+                PointRevelVisibility(
+                    true,
+                    it.point
+                )
+            }
+
+            SharedTransitionPoints.ScaleToBounds -> {
+                PointRevelVisibility(
+                    true,
+                    it.point
+                )
+            }
+
+            SharedTransitionPoints.SharedBounds -> {
+                PointRevelVisibility(
+                    true,
+                    it.point
+                )
+            }
+
+            SharedTransitionPoints.SharedElements -> {
+                PointRevelVisibility(
+                    true,
+                    it.point
+                )
+            }
+
+            SharedTransitionPoints.ZIndex -> {
+                PointRevelVisibility(
+                    true,
+                    it.point
+                )
             }
         }
     }

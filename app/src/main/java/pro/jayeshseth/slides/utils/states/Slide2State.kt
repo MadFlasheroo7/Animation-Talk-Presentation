@@ -32,7 +32,6 @@ class Slide2State {
     }
 
     fun reverseClick() {
-//        clickCounter.intValue--
         when (clickCounter.intValue) {
             5 -> {
                 clickCounter.intValue = 4

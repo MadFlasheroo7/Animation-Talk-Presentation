@@ -7,7 +7,11 @@ import pro.jayeshseth.slides.navigation.Slide1
 import pro.jayeshseth.slides.navigation.Slide2
 import pro.jayeshseth.slides.navigation.Slide3
 import pro.jayeshseth.slides.navigation.Slide4
+import pro.jayeshseth.slides.navigation.Slide5
 import pro.jayeshseth.slides.navigation.StartPage
+import pro.jayeshseth.slides.utils.states.AgslPoints
+import pro.jayeshseth.slides.utils.states.ShaderPoints
+import pro.jayeshseth.slides.utils.states.SharedTransitionPoints
 import pro.jayeshseth.slides.utils.states.Slide1TvChannels
 import pro.jayeshseth.slides.utils.states.Slide1State
 import pro.jayeshseth.slides.utils.states.Slide2State
@@ -46,11 +50,17 @@ class GlobalNavigatorViewModel : ViewModel() {
             }
 
             currentRoute.route?.equals(routeName(Slide3.serializer())) == true -> {
-                slide3State.value.handleClick()
+                if (slide3State.value.sharedTransitionPoints.value == SharedTransitionPoints.RemeasureToBounds) {
+                    navAction(Slide4)
+                } else {
+                    slide3State.value.handleClick()
+                }
             }
 
             currentRoute.route?.equals(routeName(Slide4.serializer())) == true -> {
-                slide4State.value.handleForwardClick()
+                if (slide4State.value.agslPoint.value == AgslPoints.WhyNot2) {
+                    navAction(Slide5)
+                } else slide4State.value.handleForwardClick()
             }
         }
     }

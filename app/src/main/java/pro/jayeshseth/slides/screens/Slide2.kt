@@ -241,7 +241,7 @@ fun PointReveal(
     modifier: Modifier = Modifier
 ) {
     val zeroSpacingTextStyle = textStyle.copy(letterSpacing = 0.sp)
-    val initialDelay by remember { mutableLongStateOf(500) }
+    val initialDelay by remember { mutableLongStateOf(300) }
     val letterDelay by remember { mutableLongStateOf(100) }
     FlowRow(
         modifier = modifier,

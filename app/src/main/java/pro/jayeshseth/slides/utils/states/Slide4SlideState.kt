@@ -68,7 +68,7 @@ class Slide4SlideState : SlideStateHandler() {
             AgslPoints.WhyNot2 -> AgslPoints.WhyNot2
             null -> AgslPoints.RuntimeShaderApi
         }
-        if (agslPoint.value != null && agslPoint.value != AgslPoints.WhyNot)
+        if (agslPoint.value != null && agslPoint.value != AgslPoints.WhyNot2)
             clickCounter.intValue = 4
     }
 }

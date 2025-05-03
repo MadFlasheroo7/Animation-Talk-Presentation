@@ -1,7 +1,5 @@
 package pro.jayeshseth.slides.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -22,7 +20,6 @@ import pro.jayeshseth.slides.utils.states.Slide2State
 import pro.jayeshseth.slides.utils.states.Slide3State
 import pro.jayeshseth.slides.utils.states.Slide4SlideState
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun NavGraph(
@@ -36,7 +33,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Slide4,
+        startDestination = StartPage,
         modifier = modifier
     ) {
         composable<StartPage>(
@@ -86,6 +83,27 @@ fun NavGraph(
         composable<Slide4> {
             Slide4(
                 slide4State = slide4State,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = this
+            )
+        }
+
+        composable<Slide5>(
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(400, easing = LinearEasing)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(400, easing = LinearEasing)
+                )
+            }
+        ) {
+            StartPage(
+                modifier = modifier,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = this
             )
