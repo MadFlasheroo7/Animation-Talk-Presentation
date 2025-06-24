@@ -38,25 +38,32 @@ class Slide3State {
                 if (showSharedPoints.value) upgradeSharedTransitionPoints()
             }
         }
-        Log.d("click counter", "${clickCounter.intValue}")
     }
 
     fun handleReverseClick() {
-//        clickCounter.intValue--
         when (clickCounter.intValue) {
-            4 -> {
-                if (showSharedPoints.value) {
+            3 -> {
+                if (
+                    lookaheadPoints.value == LookaheadPoints.SharedTransition &&
+                    sharedTransitionPoints.value == SharedTransitionPoints.SharedTransitionScope
+                ) {
+                    reverseLookaheadPoints()
+                } else {
+                    if (sharedTransitionPoints.value == SharedTransitionPoints.SharedBounds)
+                        showSharedPoints.value = false
+
                     reverseSharedTransition()
                 }
             }
-            3 -> {
-                showPoint1.value = false
-                clickCounter.intValue = 2
-            }
 
             2 -> {
-                showPoints.value = false
-                clickCounter.intValue = 1
+                if (lookaheadPoints.value == LookaheadPoints.WhatIsLookahead) {
+                    showPoints.value = false
+                    clickCounter.intValue = 1
+                    Log.d("click counter reverse", "${clickCounter.intValue}")
+                } else {
+                    reverseLookaheadPoints()
+                }
             }
 
             1 -> {
@@ -101,6 +108,21 @@ class Slide3State {
             SharedTransitionPoints.SharedElements -> SharedTransitionPoints.SharedBounds
             SharedTransitionPoints.SharedBounds -> SharedTransitionPoints.SharedTransitionScope
             SharedTransitionPoints.SharedTransitionScope -> SharedTransitionPoints.SharedTransitionScope
+        }
+        if (sharedTransitionPoints.value != SharedTransitionPoints.SharedTransitionScope) {
+            clickCounter.intValue = 3
+        }
+    }
+
+    fun reverseLookaheadPoints() {
+        lookaheadPoints.value = when (lookaheadPoints.value) {
+            LookaheadPoints.SharedTransition -> LookaheadPoints.WhyLookahead
+            LookaheadPoints.WhyLookahead -> LookaheadPoints.PreCalculateLayout
+            LookaheadPoints.PreCalculateLayout -> LookaheadPoints.WhatIsLookahead
+            LookaheadPoints.WhatIsLookahead -> LookaheadPoints.WhatIsLookahead
+        }
+        if (lookaheadPoints.value != LookaheadPoints.WhatIsLookahead) {
+            clickCounter.intValue = 2
         }
     }
 }

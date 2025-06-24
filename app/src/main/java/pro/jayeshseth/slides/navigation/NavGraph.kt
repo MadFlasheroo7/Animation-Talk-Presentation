@@ -33,7 +33,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = StartPage,
+        startDestination = Slide3,
         modifier = modifier
     ) {
         composable<StartPage>(

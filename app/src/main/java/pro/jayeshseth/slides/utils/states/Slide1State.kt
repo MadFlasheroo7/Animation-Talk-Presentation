@@ -1,5 +1,6 @@
 package pro.jayeshseth.slides.utils.states
 
+import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -21,9 +22,11 @@ class Slide1State {
             2 -> if (swap.value) showTvLayout.value = true
             3 -> if (showTvLayout.value) updateTvContent()
         }
+
     }
 
     fun reverseClick() {
+        Log.d("click counter", "${clickCounter.intValue}")
         when (clickCounter.intValue) {
             3 -> {
                 if (showTvLayout.value) {
